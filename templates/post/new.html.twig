@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvel Article - MMA & UFC{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+    <h1 class="mb-4">Créer un nouvel article</h1>
+
+    {{ form_start(form, {'attr': {'class': 'row g-3'}}) }}
+
+        <div class="col-md-6">
+            {{ form_label(form.title) }}
+            {{ form_widget(form.title, {'attr': {'class': 'form-control'}}) }}
+        </div>
+
+        <div class="col-md-6">
+            {{ form_label(form.featuredImages) }}
+            {{ form_widget(form.featuredImages, {'attr': {'class': 'form-control'}}) }}
+        </div>
+
+        <div class="col-12">
+            {{ form_label(form.content) }}
+            {{ form_widget(form.content, {'attr': {'class': 'form-control', 'rows': 5}}) }}
+        </div>
+
+        <div class="col-md-6">
+            {{ form_label(form.categories) }}
+            {{ form_widget(form.categories, {'attr': {'class': 'form-select', 'multiple': true}}) }}
+        </div>
+
+        <div class="col-md-6">
+            {{ form_label(form.keywords) }}
+            {{ form_widget(form.keywords, {'attr': {'class': 'form-select', 'multiple': true}}) }}
+        </div>
+
+        {{ form_widget(form._token) }}
+
+        <div class="col-12 d-flex justify-content-between mt-4">
+            <a href="{{ path('app_home') }}" class="btn btn-secondary">Retour</a>
+            <button type="submit" class="btn btn-success">Publier</button>
+        </div>
+
+    {{ form_end(form) }}
+</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil - MMA & UFC{% endblock %}
+
+{% block body %}
+<div class="text-center my-5">
+    <h1 class="display-4">Bienvenue sur MMA & UFC Blog</h1>
+    <p class="lead">Retrouvez ici les derniers articles du monde du combat</p>
+
+    {% if app.user %}
+        <div class="text-end mt-3">
+            <a href="{{ path('app_post_new') }}" class="btn btn-success">+ Nouvel article</a>
+        </div>
+    {% endif %}
+</div>
+
+<div class="row">
+    {% for post in posts %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <img src="{{ post.featuredImages ?: 'https://via.placeholder.com/600x200' }}" class="card-img-top" alt="Image du post">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ post.title }}</h5>
+                    <p class="card-text">{{ post.content[:100] ~ '...' }}</p>
+                    <a href="{{ path('app_post_show', { id: post.id }) }}" class="btn btn-primary mt-auto">Lire la suite</a>
+                </div>
+                <div class="card-footer text-muted small">
+                    Publié par {{ post.user.nickname }}<br>
+                    le {{ post.createdAt|date('d/m/Y à H:i') }}
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="col-12 text-center">
+            <p>Aucun article publié pour le moment 😢</p>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
