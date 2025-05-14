@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon compte{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+    <h1 class="mb-4">Modifier mes informations</h1>
+
+    {{ form_start(form) }}
+        {{ form_row(form.nickname) }}
+        {{ form_row(form.email) }}
+        {{ form_row(form.plainPassword.first) }}
+        {{ form_row(form.plainPassword.second) }}
+        <button class="btn btn-primary">Mettre à jour</button>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

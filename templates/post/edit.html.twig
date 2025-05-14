@@ -1,13 +1,55 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Post{% endblock %}
+{% block title %}Modifier l'article - MMA & UFC{% endblock %}
 
 {% block body %}
-    <h1>Edit Post</h1>
+<div class="container my-5">
 
-    {{ include('post/_form.html.twig', {'button_label': 'Update'}) }}
+    <!-- Bouton Retour en haut à gauche -->
+    <div class="mb-3">
+        <a href="{{ path('app_post_index') }}" class="btn btn-outline-secondary">&larr; Retour</a>
+    </div>
 
-    <a href="{{ path('app_post_index') }}">back to list</a>
+    <h1 class="mb-4">Modifier l'article</h1>
 
-    {{ include('post/_delete_form.html.twig') }}
+    {{ form_start(form) }}
+        <div class="mb-3">
+            {{ form_label(form.title) }}
+            {{ form_widget(form.title, {'attr': {'class': 'form-control'}}) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.content) }}
+            {{ form_widget(form.content, {'attr': {'class': 'form-control'}}) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.featuredImages) }}
+            {{ form_widget(form.featuredImages, {'attr': {'class': 'form-control'}}) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.imageFile) }}
+            {{ form_widget(form.imageFile, {'attr': {'class': 'form-control'}}) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.categories) }}
+            {{ form_widget(form.categories, {'attr': {'class': 'form-select', 'multiple': 'multiple'}}) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.keywords) }}
+            {{ form_widget(form.keywords, {'attr': {'class': 'form-select', 'multiple': 'multiple'}}) }}
+        </div>
+
+        <div class="text-end mt-4">
+            <button type="submit" class="btn btn-primary">Mettre à jour</button>
+        </div>
+    {{ form_end(form) }}
+
+    <div class="mt-4">
+        {{ include('post/_delete_form.html.twig') }}
+    </div>
+</div>
 {% endblock %}

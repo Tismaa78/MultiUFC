@@ -3,34 +3,86 @@
 {% block title %}Mes articles - MMA & UFC{% endblock %}
 
 {% block body %}
-<div class="my-5">
+<div class="container my-5">
     <h1 class="mb-4">Mes articles</h1>
 
-    {% if posts is not empty %}
-        <div class="row">
+    {# ✅ Messages flash #}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Titre</th>
+                <th>Créé le</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
             {% for post in posts %}
-                <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="card h-100 shadow-sm">
-                        <img src="{{ post.featuredImages ?: 'https://via.placeholder.com/600x200' }}" class="card-img-top" alt="Image de l'article">
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title">{{ post.title }}</h5>
-                            <p class="card-text">{{ post.content[:100] ~ '...' }}</p>
-                            <p class="text-muted small mb-2">
-                                Publié le {{ post.createdAt|date('d/m/Y à H:i') }}
-                            </p>
-                            <div class="mt-auto d-flex justify-content-between">
-                                <a href="{{ path('app_post_edit', { id: post.id }) }}" class="btn btn-sm btn-warning">Modifier</a>
-                                {{ include('post/_delete_form.html.twig', { post: post }) }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <tr>
+                    <td style="width: 120px;">
+                        {% if post.featuredImages starts with '/uploads/' %}
+                            <img src="{{ asset(post.featuredImages) }}" alt="Upload" class="img-thumbnail" style="max-width: 100px;">
+                        {% elseif post.featuredImages %}
+                            <img src="{{ post.featuredImages }}" alt="Externe" class="img-thumbnail" style="max-width: 100px;">
+                        {% else %}
+                            <img src="https://via.placeholder.com/100x60?text=Aucune" alt="Placeholder" class="img-thumbnail">
+                        {% endif %}
+                    </td>
+                    <td>{{ post.title }}</td>
+                    <td>{{ post.createdAt|date('d/m/Y H:i') }}</td>
+                    <td>
+                        <a href="{{ path('app_post_show', {'id': post.id}) }}" class="btn btn-sm btn-outline-primary">Voir</a>
+                        <a href="{{ path('app_post_edit', {'id': post.id}) }}" class="btn btn-sm btn-outline-warning">Modifier</a>
+                        <form method="post" action="{{ path('app_post_delete', {id: post.id}) }}" class="d-inline" onsubmit="return confirm('Supprimer cet article ?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.id) }}">
+                            <button class="btn btn-sm btn-outline-danger">Supprimer</button>
+                        </form>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted">Tu n'as pas encore publié d'article.</td>
+                </tr>
             {% endfor %}
+        </tbody>
+    </table>
+    
+    <hr class="my-5">
+
+    <h2>Modifier mes informations</h2>
+    {{ form_start(user_form) }}
+        <div class="mb-3">
+            {{ form_label(user_form.nickname) }}
+            {{ form_widget(user_form.nickname, { 'attr': {'class': 'form-control'} }) }}
         </div>
-    {% else %}
-        <div class="alert alert-info text-center" role="alert">
-            Tu n'as pas encore rédigé d'article.
+        <div class="mb-3">
+            {{ form_label(user_form.email) }}
+            {{ form_widget(user_form.email, { 'attr': {'class': 'form-control'} }) }}
         </div>
-    {% endif %}
+    <div class="mb-3">
+    {{ form_label(user_form.currentPassword) }}
+    {{ form_widget(user_form.currentPassword, { 'attr': {'class': 'form-control'} }) }}
+    </div>
+
+        <div class="mb-3">
+            {{ form_label(user_form.plainPassword.first) }}
+            {{ form_widget(user_form.plainPassword.first, { 'attr': {'class': 'form-control'} }) }}
+        </div>
+        <div class="mb-3">
+            {{ form_label(user_form.plainPassword.second) }}
+            {{ form_widget(user_form.plainPassword.second, { 'attr': {'class': 'form-control'} }) }}
+        </div>
+
+        <button class="btn btn-primary">Mettre à jour</button>
+    {{ form_end(user_form) }}
 </div>
 {% endblock %}

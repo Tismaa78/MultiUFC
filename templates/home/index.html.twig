@@ -4,36 +4,151 @@
 
 {% block body %}
 <div class="text-center my-5">
-    <h1 class="display-4">Bienvenue sur MMA & UFC Blog</h1>
-    <p class="lead">Retrouvez ici les derniers articles du monde du combat</p>
 
-    {% if app.user %}
-        <div class="text-end mt-3">
+<div class="banner-container mb-5">
+    <img src="{{ asset('images/banner.jpg') }}" alt="Bannière MMA" class="img-fluid w-100 rounded shadow">
+</div>
+{% if featuredPost %}
+    <div class="alert alert-warning text-center fw-bold mb-5">
+        ⭐ À la une :
+        <a href="{{ path('app_post_show', { id: featuredPost.id }) }}" class="alert-link">
+            {{ featuredPost.title }}
+        </a>
+    </div>
+{% endif %}
+
+
+
+    <h1 class="display-4">Bienvenue sur le blog MMA & UFC</h1>
+    {# <p class="lead">Retrouvez ici les derniers articles du monde du combat</p> #}
+
+    {# {% if app.user %}
+        <div class="text-end mt-3 container">
             <a href="{{ path('app_post_new') }}" class="btn btn-success">+ Nouvel article</a>
         </div>
-    {% endif %}
+    {% endif %} #}
 </div>
 
-<div class="row">
-    {% for post in posts %}
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 shadow-sm">
-                <img src="{{ post.featuredImages ?: 'https://via.placeholder.com/600x200' }}" class="card-img-top" alt="Image du post">
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">{{ post.title }}</h5>
-                    <p class="card-text">{{ post.content[:100] ~ '...' }}</p>
-                    <a href="{{ path('app_post_show', { id: post.id }) }}" class="btn btn-primary mt-auto">Lire la suite</a>
+<div class="container">
+
+    <!-- 🔥 Articles populaires -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">🔥 Articles populaires</h2>
+        <a href="{{ path('app_post_popular') }}" class="btn btn-outline-secondary btn-sm">Voir tous</a>
+    </div>
+
+    <div class="carousel-wrapper position-relative mb-5">
+        <div class="d-flex overflow-auto gap-4 scroll-container">
+            {% for post in topPosts|slice(0, 15) %}
+                <div class="card flex-shrink-0" style="width: 300px;">
+                    <img src="{{ post.featuredImages ?: 'https://via.placeholder.com/600x200' }}" class="card-img-top" alt="Image du post">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ post.title }}</h5>
+                        <p class="card-text">{{ post.content[:100] ~ '...' }}</p>
+                        <a href="{{ path('app_post_show', { id: post.id }) }}" class="btn btn-outline-primary mt-auto">Lire</a>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between small text-muted">
+                        <span>👍 {{ post.likes }}</span>
+                        <span> {{ post.user.nickname }}</span>
+                        <span>🕓 {{ post.createdAt|date('d/m/Y à H:i') }}</span>
+                    </div>
                 </div>
-                <div class="card-footer text-muted small">
-                    Publié par {{ post.user.nickname }}<br>
-                    le {{ post.createdAt|date('d/m/Y à H:i') }}
+            {% endfor %}
+        </div>
+        <button class="carousel-next btn btn-light shadow">➡</button>
+    </div>
+
+    <!-- 🆕 Derniers articles -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">🆕 Derniers articles</h2>
+<a href="{{ path('app_post_recents') }}" class="btn btn-outline-secondary btn-sm">Voir tous</a>
+
+
+    </div>
+
+    <div class="carousel-wrapper position-relative mb-5">
+        <div class="d-flex overflow-auto gap-4 scroll-container">
+            {% for post in recentPosts|slice(0, 15) %}
+                <div class="card flex-shrink-0" style="width: 300px;">
+                    <img src="{{ post.featuredImages ?: 'https://via.placeholder.com/600x200' }}" class="card-img-top" alt="Image du post">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ post.title }}</h5>
+                        <p class="card-text">{{ post.content[:100] ~ '...' }}</p>
+                        <a href="{{ path('app_post_show', { id: post.id }) }}" class="btn btn-outline-primary mt-auto">Lire</a>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between small text-muted">
+                        <span>👍 {{ post.likes }}</span>
+                        <span> {{ post.user.nickname }}</span>
+                        <span>🕓 {{ post.createdAt|date('d/m/Y à H:i') }}</span>
+                    </div>
                 </div>
-            </div>
+            {% endfor %}
         </div>
-    {% else %}
-        <div class="col-12 text-center">
-            <p>Aucun article publié pour le moment 😢</p>
-        </div>
-    {% endfor %}
+        <button class="carousel-next btn btn-light shadow">➡</button>
+    </div>
+    {% if app.user %}
+    <a href="{{ path('app_post_new') }}" class="btn btn-dark position-fixed" style="bottom: 30px; right: 30px; z-index: 999;">
+        +
+    </a>
+{% endif %}
+
+
 </div>
+
+<style>
+.card:hover {
+    transform: scale(1.02);
+    transition: transform 0.3s ease;
+}
+
+.btn-secondary {
+    font-weight: 500;
+    border-radius: 20px;
+    padding: 9px 10px;
+}
+
+
+.banner-container img {
+    max-height: 400px;
+    object-fit: cover;
+    width: 100%;
+}
+
+.scroll-container {
+    scroll-behavior: smooth;
+    overflow-x: auto;
+    padding-bottom: 10px;
+}
+.carousel-wrapper {
+    position: relative;
+}
+.carousel-next {
+    position: absolute;
+    top: 35%;
+    right: -10px;
+    z-index: 10;
+    border-radius: 50%;
+    padding: 5px 12px;
+}
+@media (max-width: 768px) {
+    .carousel-next {
+        top: 45%;
+        right: 5px;
+    }
+}
+</style>
+
+<script>
+    document.querySelectorAll('.carousel-wrapper').forEach(wrapper => {
+        const scrollContainer = wrapper.querySelector('.scroll-container');
+        const nextBtn = wrapper.querySelector('.carousel-next');
+
+        nextBtn?.addEventListener('click', () => {
+            scrollContainer.scrollBy({
+                left: 320,
+                behavior: 'smooth'
+            });
+        });
+    });
+</script>
 {% endblock %}

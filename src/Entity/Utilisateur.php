@@ -34,16 +34,10 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(nullable: true)]
     private ?bool $isVerified = null;
 
-    /**
-     * @var Collection<int, Post>
-     */
-    #[ORM\OneToMany(targetEntity: Post::class, mappedBy: 'user')]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Post::class)]
     private Collection $posts;
 
-    /**
-     * @var Collection<int, Commentaire>
-     */
-    #[ORM\OneToMany(targetEntity: Commentaire::class, mappedBy: 'users')]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Commentaire::class)]
     private Collection $commentaires;
 
     public function __construct()
@@ -52,15 +46,9 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         $this->commentaires = new ArrayCollection();
     }
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+    public function getId(): ?int { return $this->id; }
 
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
+    public function getEmail(): ?string { return $this->email; }
 
     public function setEmail(string $email): static
     {
@@ -68,10 +56,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getPassword(): string
-    {
-        return $this->password;
-    }
+    public function getPassword(): string { return $this->password; }
 
     public function setPassword(string $password): static
     {
@@ -79,10 +64,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getRole(): ?string
-    {
-        return $this->role;
-    }
+    public function getRole(): ?string { return $this->role; }
 
     public function setRole(string $role): static
     {
@@ -90,10 +72,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getNickname(): ?string
-    {
-        return $this->nickname;
-    }
+    public function getNickname(): ?string { return $this->nickname; }
 
     public function setNickname(string $nickname): static
     {
@@ -101,10 +80,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function isVerified(): ?bool
-    {
-        return $this->isVerified;
-    }
+    public function isVerified(): ?bool { return $this->isVerified; }
 
     public function setIsVerified(?bool $isVerified): static
     {
@@ -112,13 +88,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @return Collection<int, Post>
-     */
-    public function getPosts(): Collection
-    {
-        return $this->posts;
-    }
+    public function getPosts(): Collection { return $this->posts; }
 
     public function addPost(Post $post): static
     {
@@ -126,7 +96,6 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
             $this->posts->add($post);
             $post->setUser($this);
         }
-
         return $this;
     }
 
@@ -137,53 +106,33 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
                 $post->setUser(null);
             }
         }
-
         return $this;
     }
 
-    /**
-     * @return Collection<int, Commentaire>
-     */
-    public function getCommentaires(): Collection
-    {
-        return $this->commentaires;
-    }
+    public function getCommentaires(): Collection { return $this->commentaires; }
 
     public function addCommentaire(Commentaire $commentaire): static
     {
         if (!$this->commentaires->contains($commentaire)) {
             $this->commentaires->add($commentaire);
-            $commentaire->setUsers($this);
+            $commentaire->setUser($this);
         }
-
         return $this;
     }
 
     public function removeCommentaire(Commentaire $commentaire): static
     {
         if ($this->commentaires->removeElement($commentaire)) {
-            if ($commentaire->getUsers() === $this) {
-                $commentaire->setUsers(null);
+            if ($commentaire->getUser() === $this) {
+                $commentaire->setUser(null);
             }
         }
-
         return $this;
     }
 
-    // Méthodes requises par les interfaces
+    public function getUserIdentifier(): string { return $this->email; }
 
-    public function getUserIdentifier(): string
-    {
-        return $this->email;
-    }
+    public function getRoles(): array { return [$this->role ?? 'ROLE_USER']; }
 
-    public function getRoles(): array
-    {
-        return [$this->role ?? 'ROLE_USER'];
-    }
-
-    public function eraseCredentials(): void
-    {
-        // Tu peux laisser vide si tu ne stockes pas d'infos sensibles temporairement
-    }
+    public function eraseCredentials(): void {}
 }

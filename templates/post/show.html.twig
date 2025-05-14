@@ -12,15 +12,29 @@
         </p>
     </div>
 
-    {% if post.featuredImages %}
-        <div class="text-center mb-4">
-            <img src="{{ post.featuredImages }}" alt="Image de l'article" class="img-fluid rounded shadow-sm">
-        </div>
-    {% endif %}
+    <div class="text-center mb-4">
+        {% if post.featuredImages starts with '/uploads/' %}
+            <img src="{{ asset(post.featuredImages) }}" alt="Image uploadée" class="img-fluid rounded shadow-sm">
+        {% elseif post.featuredImages %}
+            <img src="{{ post.featuredImages }}" alt="Image via URL" class="img-fluid rounded shadow-sm">
+        {% else %}
+            <img src="https://via.placeholder.com/800x300?text=Pas+d%27image" alt="Aucune image" class="img-fluid rounded shadow-sm">
+        {% endif %}
+    </div>
 
-    <div class="fs-5 lh-lg">
+    <div class="fs-5 lh-lg mb-3">
         {{ post.content|nl2br }}
     </div>
+
+    {# ✅ Bouton LIKE sur le post lui-même #}
+    {% if app.user %}
+        <form method="post" action="{{ path('app_post_like', {id: post.id}) }}" class="mb-4">
+            <input type="hidden" name="_token" value="{{ csrf_token('like_post_' ~ post.id) }}">
+            <button class="btn btn-outline-primary btn-sm">👍 {{ post.likes }} J’aime</button>
+        </form>
+    {% else %}
+        <p class="text-muted">👍 {{ post.likes }} J’aime</p>
+    {% endif %}
 
     {% if post.categories|length > 0 %}
         <div class="mt-4">
@@ -40,15 +54,124 @@
         </div>
     {% endif %}
 
+    <div class="mt-5">
+        <h4>Commentaires</h4>
+
+        {% for commentaire in commentaires %}
+            {% if commentaire.parent is null %}
+                <div class="border rounded p-3 mb-3">
+                    <p class="mb-1">
+                        <strong>{{ commentaire.user.nickname }}</strong>
+                        <small class="text-muted">le {{ commentaire.createdAt|date('d/m/Y à H:i') }}</small>
+                    </p>
+                    <p>{{ commentaire.content }}</p>
+
+                    <a href="{{ path('app_commentaire_reply', {id: commentaire.id}) }}" class="btn btn-sm btn-outline-secondary mt-2">Répondre</a>
+
+                    <button
+                        class="btn btn-sm btn-outline-primary btn-like"
+                        data-id="{{ commentaire.id }}"
+                        data-token="{{ csrf_token('like_comment_' ~ commentaire.id) }}">
+                        👍 <span id="like-count-{{ commentaire.id }}">{{ commentaire.likes }}</span>
+                    </button>
+
+                    {% if app.user and commentaire.user == app.user %}
+                        <form method="post" action="{{ path('app_commentaire_delete', {id: commentaire.id}) }}" onsubmit="return confirm('Supprimer ce commentaire ?');" class="d-inline">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete_comment_' ~ commentaire.id) }}">
+                            <button class="btn btn-sm btn-outline-danger">Supprimer</button>
+                        </form>
+                    {% endif %}
+
+                    {% for reply in commentaire.children %}
+                        <div class="border rounded p-2 ms-4 mt-2 bg-light">
+                            <p class="mb-1">
+                                <strong>{{ reply.user.nickname }}</strong>
+                                <small class="text-muted">le {{ reply.createdAt|date('d/m/Y à H:i') }}</small>
+                            </p>
+                            <p>{{ reply.content }}</p>
+
+                            <button
+                                class="btn btn-sm btn-outline-primary btn-like"
+                                data-id="{{ reply.id }}"
+                                data-token="{{ csrf_token('like_comment_' ~ reply.id) }}">
+                                👍 <span id="like-count-{{ reply.id }}">{{ reply.likes }}</span>
+                            </button>
+
+                            {% if app.user and reply.user == app.user %}
+                                <form method="post" action="{{ path('app_commentaire_delete', {id: reply.id}) }}" onsubmit="return confirm('Supprimer cette réponse ?');" class="d-inline">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete_comment_' ~ reply.id) }}">
+                                    <button class="btn btn-sm btn-outline-danger">Supprimer</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% else %}
+            <p class="text-muted">Aucun commentaire pour le moment.</p>
+        {% endfor %}
+    </div>
+
+    {% if app.user %}
+        <div class="mt-4">
+            {{ form_start(comment_form) }}
+            {{ form_row(comment_form.content) }}
+            <button type="submit" class="btn btn-success">Commenter</button>
+            {{ form_end(comment_form) }}
+        </div>
+    {% else %}
+        <p class="text-muted mt-3">Connectez-vous pour commenter cet article.</p>
+    {% endif %}
+
     <div class="mt-5 d-flex justify-content-between">
         <a href="{{ path('app_post_index') }}" class="btn btn-outline-secondary">&larr; Retour</a>
 
         {% if app.user and app.user == post.user %}
             <div>
                 <a href="{{ path('app_post_edit', { id: post.id }) }}" class="btn btn-primary">Modifier</a>
-                {{ include('post/_delete_form.html.twig') }}
+                <form method="post" action="{{ path('app_post_delete', {id: post.id}) }}" onsubmit="return confirm('Confirmer la suppression de cet article ?');" class="d-inline">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.id) }}">
+                    <button class="btn btn-danger">Supprimer</button>
+                </form>
             </div>
         {% endif %}
     </div>
 </div>
+
+<script>
+    document.querySelectorAll('.btn-like').forEach(button => {
+        button.addEventListener('click', async function () {
+            const commentId = this.dataset.id;
+            const csrfToken = this.dataset.token;
+            const cookieName = 'liked_comment_' + commentId;
+            const cookieAlreadySet = document.cookie.includes(`${cookieName}=true`);
+
+            if (cookieAlreadySet) {
+                alert("Tu as déjà liké ce commentaire.");
+                return;
+            }
+
+            const response = await fetch(`/commentaire/${commentId}/like`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `_token=${encodeURIComponent(csrfToken)}`
+            });
+
+            if (response.status === 409) {
+                alert("Tu as déjà liké ce commentaire.");
+                return;
+            }
+
+            if (response.ok) {
+                const span = document.getElementById('like-count-' + commentId);
+                const current = parseInt(span.textContent);
+                span.textContent = current + 1;
+                document.cookie = `${cookieName}=true; path=/; max-age=${60 * 60 * 24 * 365}`;
+            }
+        });
+    });
+</script>
+
 {% endblock %}

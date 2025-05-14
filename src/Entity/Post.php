@@ -27,13 +27,16 @@ class Post
     #[ORM\Column(type: Types::TEXT)]
     private ?string $content = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 1024, nullable: true)]
     private ?string $featuredImages = null;
+
+    #[ORM\Column(type: 'integer', options: ['default' => 0])]
+    private int $likes = 0;
 
     /**
      * @var Collection<int, Commentaire>
      */
-    #[ORM\OneToMany(targetEntity: Commentaire::class, mappedBy: 'posts')]
+    #[ORM\OneToMany(mappedBy: 'post', targetEntity: Commentaire::class, orphanRemoval: true)]
     private Collection $commentaires;
 
     /**
@@ -56,7 +59,9 @@ class Post
         $this->commentaires = new ArrayCollection();
         $this->categories = new ArrayCollection();
         $this->keywords = new ArrayCollection();
+        $this->likes = 0; // ← ça c’est essentiel côté PHP pour éviter NULL
     }
+    
 
     public function getId(): ?int
     {
@@ -107,6 +112,23 @@ class Post
         return $this;
     }
 
+    public function getLikes(): int
+    {
+        return $this->likes;
+    }
+
+    public function setLikes(int $likes): static
+    {
+        $this->likes = $likes;
+        return $this;
+    }
+
+    public function incrementLikes(): static
+    {
+        $this->likes++;
+        return $this;
+    }
+
     /**
      * @return Collection<int, Commentaire>
      */
@@ -119,7 +141,7 @@ class Post
     {
         if (!$this->commentaires->contains($commentaire)) {
             $this->commentaires->add($commentaire);
-            $commentaire->setPosts($this);
+            $commentaire->setPost($this);
         }
 
         return $this;
@@ -128,8 +150,8 @@ class Post
     public function removeCommentaire(Commentaire $commentaire): static
     {
         if ($this->commentaires->removeElement($commentaire)) {
-            if ($commentaire->getPosts() === $this) {
-                $commentaire->setPosts(null);
+            if ($commentaire->getPost() === $this) {
+                $commentaire->setPost(null);
             }
         }
 
