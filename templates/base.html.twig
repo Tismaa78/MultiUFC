@@ -4,43 +4,43 @@
     <meta charset="UTF-8">
     <title>{% block title %}MMA & UFC Blog{% endblock %}</title>
 
-    <!-- ✅ CDN de Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    {% block stylesheets %}{% endblock %}
-</head>
-<body class="bg-light">
-
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-
-        <div class="container">
-<a class="navbar-brand d-flex align-items-center gap-2" href="/">
-    <img src="{{ asset('images/logo.png') }}" alt="Logo" style="height: 45px;">
-    <span>MMA & UFC</span>
-</a>
 
 <style>
     body {
-        padding-top: 70px; /* Ajuste si nécessaire selon la hauteur de ta navbar */
+        padding-top: 70px;
+    }
+    .btn-custom-pill {
+        border-radius: 50px !important;
+        padding: 0.45rem 1.1rem !important;
+        font-size: 0.95rem !important;
+        font-weight: 500 !important;
     }
 </style>
 
 
-            <!-- Bouton hamburger responsive -->
+    {% block stylesheets %}{% endblock %}
+</head>
+<body class="d-flex flex-column min-vh-100 bg-light">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+                <img src="{{ asset('images/logo.png') }}" alt="Logo" style="height: 45px;">
+                <span>MMA & UFC</span>
+            </a>
+
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-
-                    <!-- ✅ Menu déroulant des catégories -->
                     {% if app.user %}
                         <li class="nav-item">
-                            <a class="btn btn-secondary ms-3" href="{{ path('app_post_new') }}">+ Nouvel article</a>
+                            <a class="btn btn-secondary ms-3 btn-custom-pill" href="{{ path('app_post_new') }}">+ Nouvel article</a>
                         </li>
                     {% endif %}
-
 
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="categorieDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -56,20 +56,17 @@
                     </li>
 
                     {% if app.user %}
-
-                        
                         <li class="nav-item">
                             <a class="nav-link" href="{{ path('app_post_my') }}">Mon compte</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ path('app_logout') }}">Déconnexion</a>
                         </li>
-
                         <li class="nav-item">
                             <span class="navbar-text text-white me-3">
                                 Bienvenue {{ app.user.nickname }}
                             </span>
-                        </li>                        
+                        </li>
                     {% else %}
                         <li class="nav-item">
                             <a class="nav-link" href="{{ path('app_register') }}">Inscription</a>
@@ -83,37 +80,33 @@
         </div>
     </nav>
 
-    <main class="container">
+    <main class="container flex-grow-1">
         {% block body %}{% endblock %}
     </main>
 
-<footer class="bg-dark text-light mt-5 pt-4 pb-3">
-    <div class="container text-center">
-        <p class="mb-1">&copy; {{ "now"|date("Y") }} - Blog MMA & UFC. Tous droits réservés.</p>
-        
-        <ul class="list-inline small mb-2">
-            <li class="list-inline-item">
-                <a href="{{ path('app_mentions_legales') }}" class="text-light text-decoration-underline">Mentions légales</a>
-            </li>
-            <li class="list-inline-item">
-                <a href="{{ path('app_conditions_utilisation') }}" class="text-light text-decoration-underline">Conditions d'utilisation</a>
-            </li>
-            <li class="list-inline-item">
-                <a href="{{ path('app_confidentialite') }}" class="text-light text-decoration-underline">Politique de confidentialité</a>
-            </li>
-            <li class="list-inline-item">
-                <a href="{{ path('app_contact') }}" class="text-light text-decoration-underline">Contact</a>
-            </li>
-        </ul>
+    <footer class="bg-dark text-light mt-5 pt-4 pb-3">
+        <div class="container text-center">
+            <p class="mb-1">&copy; {{ "now"|date("Y") }} - Blog MMA & UFC. Tous droits réservés.</p>
+            
+            <ul class="list-inline small mb-2">
+                <li class="list-inline-item">
+                    <a href="{{ path('app_mentions_legales') }}" class="text-light text-decoration-underline">Mentions légales</a>
+                </li>
+                <li class="list-inline-item">
+                    <a href="{{ path('app_conditions_utilisation') }}" class="text-light text-decoration-underline">Conditions d'utilisation</a>
+                </li>
+                <li class="list-inline-item">
+                    <a href="{{ path('app_confidentialite') }}" class="text-light text-decoration-underline">Politique de confidentialité</a>
+                </li>
+                <li class="list-inline-item">
+                    <a href="{{ path('app_contact') }}" class="text-light text-decoration-underline">Contact</a>
+                </li>
+            </ul>
 
-        <p class="small text-muted mb-0">Ce site est un projet fictif dans le cadre d’un exercice de développement web. Aucun contenu n’est à caractère commercial.</p>
-    </div>
-</footer>
+            <p class="small text-muted mb-0">Ce site est un projet fictif dans le cadre d’un exercice de développement web. Aucun contenu n’est à caractère commercial.</p>
+        </div>
+    </footer>
 
-
-
-
-    <!-- ✅ Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     {% block javascripts %}{% endblock %}
