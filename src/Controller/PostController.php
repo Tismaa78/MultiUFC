@@ -71,49 +71,16 @@ final class PostController extends AbstractController
         ]);
     }
 
-    #[Route('/mes-articles', name: 'app_post_my', methods: ['GET', 'POST'])]
-    public function myPosts(
-        Request $request,
-        PostRepository $postRepository,
-        EntityManagerInterface $entityManager,
-        UserPasswordHasherInterface $passwordHasher
-    ): Response {
+    #[Route('/mes-articles', name: 'app_mes_articles')]
+    public function mesArticles(EntityManagerInterface $entityManager): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_USER');
+        
         $user = $this->getUser();
-    
-        if (!$user) {
-            $this->addFlash('warning', 'Vous devez être connecté pour accéder à vos articles.');
-            return $this->redirectToRoute('app_login');
-        }
-    
-        $form = $this->createForm(MonCompteType::class, $user);
-        $form->handleRequest($request);
-    
-        if ($form->isSubmitted() && $form->isValid()) {
-            $currentPassword = $form->get('currentPassword')->getData();
-            $plainPassword = $form->get('plainPassword')->getData();
-            
-            if (!empty($plainPassword)) {
-                if (!$passwordHasher->isPasswordValid($user, $currentPassword)) {
-                    $this->addFlash('danger', 'Le mot de passe actuel est incorrect.');
-                    return $this->redirectToRoute('app_post_my');
-                }
-            
-                $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
-                $user->setPassword($hashedPassword);
-            }
-            
-        
-            $entityManager->flush();
-            $this->addFlash('success', 'Vos informations ont bien été mises à jour.');
-            return $this->redirectToRoute('app_post_my');
-        }
-        
-    
-        $posts = $postRepository->findBy(['user' => $user]);
-    
-        return $this->render('post/my_posts.html.twig', [
+        $posts = $entityManager->getRepository(Post::class)->findBy(['user' => $user], ['createdAt' => 'DESC']);
+
+        return $this->render('post/mes_articles.html.twig', [
             'posts' => $posts,
-            'user_form' => $form->createView(),
         ]);
     }
     

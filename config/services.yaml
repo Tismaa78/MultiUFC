@@ -1,3 +1,8 @@
+parameters:
+    google_recaptcha_site_key: '%env(GOOGLE_RECAPTCHA_SITE_KEY)%'
+    google_recaptcha_secret_key: '%env(GOOGLE_RECAPTCHA_SECRET_KEY)%'
+    uploads_directory: '%kernel.project_dir%/public/uploads'
+
 # config/services.yaml
 services:
     _defaults:
@@ -19,5 +24,11 @@ services:
     App\Twig\GlobalCategoriesExtension:
         tags: ['twig.extension']
 
-parameters:
-    uploads_directory: '%kernel.project_dir%/public/uploads'       
+    App\Service\RecaptchaService:
+        arguments:
+            $secretKey: '%google_recaptcha_secret_key%'
+
+    App\Twig\RecaptchaExtension:
+        arguments:
+            $siteKey: '%google_recaptcha_site_key%'
+        tags: ['twig.extension']

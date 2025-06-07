@@ -57,15 +57,20 @@
 
                     {% if app.user %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ path('app_post_my') }}">Mon compte</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ path('app_logout') }}">Déconnexion</a>
-                        </li>
-                        <li class="nav-item">
                             <span class="navbar-text text-white me-3">
                                 Bienvenue {{ app.user.nickname }}
                             </span>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('app_mes_articles') }}">Mes articles</a>
+                        </li>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('app_admin') }}">Administration</a>
+                            </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('app_logout') }}">Déconnexion</a>
                         </li>
                     {% else %}
                         <li class="nav-item">
@@ -103,7 +108,7 @@
                 </li>
             </ul>
 
-            <p class="small text-muted mb-0">Ce site est un projet fictif dans le cadre d’un exercice de développement web. Aucun contenu n’est à caractère commercial.</p>
+            <p class="small text-muted mb-0">Ce site est un projet fictif dans le cadre d'un exercice de développement web. Aucun contenu n'est à caractère commercial.</p>
         </div>
     </footer>
 

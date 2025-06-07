@@ -78,7 +78,7 @@ class ResetPasswordController extends AbstractController
             if ($newPassword) {
                 $hashedPassword = $passwordHasher->hashPassword($user, $newPassword);
                 $user->setPassword($hashedPassword);
-                $user->resetToken = null;
+                $user->setResetToken(null);
 
                 $entityManager->flush();
 

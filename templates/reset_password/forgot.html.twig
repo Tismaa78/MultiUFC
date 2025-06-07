@@ -3,9 +3,28 @@
 {% block title %}Mot de passe oublié{% endblock %}
 
 {% block body %}
-<h1 class="mb-4">Réinitialiser le mot de passe</h1>
-{{ form_start(form) }}
-    {{ form_row(form.email) }}
-    <button class="btn btn-primary">Envoyer un lien de réinitialisation</button>
-{{ form_end(form) }}
+<div class="container my-5">
+    <h1 class="mb-4">Réinitialiser le mot de passe</h1>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('danger') %}
+        <div class="alert alert-danger">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    {{ form_start(form) }}
+        <div class="mb-3">
+            {{ form_label(form.email) }}
+            {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.email) }}
+        </div>
+        <button type="submit" class="btn btn-primary">Envoyer le lien de réinitialisation</button>
+    {{ form_end(form) }}
+</div>
 {% endblock %}

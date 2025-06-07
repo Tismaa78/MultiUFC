@@ -184,7 +184,12 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        return [$this->role ?? 'ROLE_USER'];
+        $roles = [$this->getRole()];
+        // Garantit que tous les utilisateurs ont au moins ROLE_USER
+        if (!in_array('ROLE_USER', $roles)) {
+            $roles[] = 'ROLE_USER';
+        }
+        return array_unique($roles);
     }
 
     public function eraseCredentials(): void

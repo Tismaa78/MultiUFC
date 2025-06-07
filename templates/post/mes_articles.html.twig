@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Articles{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+    <h1 class="mb-4">Mes Articles</h1>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    {% if posts is empty %}
+        <div class="alert alert-info">
+            Vous n'avez pas encore publié d'articles.
+            <a href="{{ path('app_post_new') }}" class="btn btn-primary ms-3">Créer un article</a>
+        </div>
+    {% else %}
+        <div class="row">
+            {% for post in posts %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        {% if post.featuredImages %}
+                            <img src="{{ asset(post.featuredImages) }}" class="card-img-top" alt="{{ post.title }}">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ post.title }}</h5>
+                            <p class="card-text">{{ post.content|slice(0, 100) }}...</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">{{ post.createdAt|date('d/m/Y') }}</small>
+                                <div class="btn-group">
+                                    <a href="{{ path('app_post_show', {'id': post.id}) }}" class="btn btn-sm btn-outline-primary">Voir</a>
+                                    <a href="{{ path('app_post_edit', {'id': post.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                                    <form method="post" action="{{ path('app_post_delete', {'id': post.id}) }}" style="display: inline-block" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.id) }}">
+                                        <button class="btn btn-sm btn-outline-danger">Supprimer</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 
